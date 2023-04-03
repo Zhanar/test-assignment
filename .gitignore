@@ -1,0 +1,30 @@
+# ignore NuGet packages
+*/packages/*
+
+# ignore Visual Studio files
+*.user
+*.suo
+*.cache
+*.dll
+*.exe
+*.log
+*.vspscc
+*.vssscc
+*.obj
+*.pdb
+*.ncb
+*.sdf
+*.opensdf
+*.sln.docstates
+
+# ignore ReSharper files
+*.ReSharper*
+_ReSharper*
+
+# ignore build output
+[Bb]in/
+[Oo]bj/
+
+# ignore publish output
+*.pubxml
+*.pubxml.user

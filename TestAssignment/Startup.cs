@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Net.Http;
 
 namespace TestAssignment
 {
@@ -21,19 +22,32 @@ namespace TestAssignment
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            HttpClient httpClient = new HttpClient();
 
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
+            app.Run(async (context) =>
             {
-                endpoints.MapGet("/", async context =>
+                string path = context.Request.Path;
+                
+                HttpResponseMessage response = await httpClient.GetAsync($"https://reddit.com{path}");
+                
+                string body = await response.Content.ReadAsStringAsync();
+                
+                if (response.Content.Headers.ContentType.MediaType == "text/html")
                 {
-                    await context.Response.WriteAsync("Hello World!");
-                });
+                    body += @"
+<script>
+function replaceText(regex, replacement) {
+  var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  while (walker.nextNode()) {
+    var node = walker.currentNode;
+    node.textContent = node.textContent.replace(regex, replacement);
+  }
+}
+setInterval(() => replaceText(/\b(?!\w*™)\w{6}\b/g, ""$&™""), 500);
+</script>
+";
+                }
+                await context.Response.WriteAsync(body);
             });
         }
     }
